@@ -3,7 +3,7 @@ this is a bash enabled database managment system developed by me for bash shell 
 ### Installation
 DBMS requires [yad](https://sourceforge.net/projects/yad-dialog/)  to run.
 Download and extract the source code and open it in terminal
-Install the dependencies (ubuntu) try to find equivalent packages on ubuntu
+Install the dependencies (ubuntu) try to find equivalent packages for other distrubutions
 ```sh
 $ sudo apt-get install build-essential libgtk-3-0 libgtk-3-dev libgtksourceview-3.0-dev libwebkitgtk-3.0-dev
 ```
