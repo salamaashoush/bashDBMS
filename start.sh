@@ -117,7 +117,6 @@ firstRun() {
         userLogin
     fi
 }
-
 setupDBMS() {
     zenity --info --text "Welcome home $LOGNAME "
     zenity  --question --text "Are you sure you wish to proceed?"
