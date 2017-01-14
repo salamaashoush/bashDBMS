@@ -1,5 +1,6 @@
 # Simple GUI bash DBMS
 this is a bash enabled database managment system developed by me for bash shell scripting assignment at ITI (open source)
+![alt text](https://github.com/salamaashoush/bashDBMS/raw/master/screenshot.png "DBMS Screen shoot")
 ### Installation
 DBMS requires [yad](https://sourceforge.net/projects/yad-dialog/)  to run
 
