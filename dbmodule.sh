@@ -3,16 +3,23 @@ showDB() {
     subdircount=`find "$PARENTDIR"/"" -maxdepth 1 -type d | wc -l`
     if [ $subdircount -eq 1 ]
     then
-        ERROR="No Databases Found"
         zenity --info --text="No Databases Found"
     else
         ls -dl "$PARENTDIR"/*/"" | awk 'BEGIN{FS=" "}{ print $9}' | awk 'BEGIN{FS="/"}{ print $5 }'|zenity --text-info --title="Databases"
     fi
 }
-
-#changes working directory to the selected database dir
+dropDB(){
+    if [[ -e "$PARENTDIR"/""$3"" ]]
+    then
+        cd "$PARENTDIR"
+        rm -rf "$3"
+        zenity --info --text="$3 database deleted"
+    else
+        zenity --error --text="database not exits"
+    fi
+}
 useDB() {
-    if test -e "$PARENTDIR"/""$2"" && [[ "$2" != "" ]]
+    if [[ -e "$PARENTDIR"/""$2"" ]] && [[ "$2" != "" ]]
     then
         CURRENTDB=$2
         cd "$PARENTDIR"/""$2""
@@ -21,7 +28,6 @@ useDB() {
         zenity --error --text="database not exits"
     fi
 }
-#checks if there is adirectory already matching the to be created database , creates new dir for every DB
 newDB() {
     local r_db_name="${*: -1}"
     local db_path

@@ -7,7 +7,6 @@ GPK=""
 . ./tablemodule.sh
 . ./dbmodule.sh
 . ./usermodule.sh
-#processes commands and redirects workflow according
 checkCommand() {
     if [[ "$1" == "create" ]]
     then
@@ -37,9 +36,14 @@ checkCommand() {
     then
         selectAllTable $*
     fi
-    if [[ "$1" == "select" ]] && [[ "$2" != "all" ]]
+    #if [[ "$1" == "select" ]] && [[ "$2" == "all" ]] && [[ "$5" == "where" ]]
+    #then
+        #selectAllTableWhere $*
+    #fi
+
+    if [[ "$1" == "select" ]] && [[ "$2" == "row" ]]
     then
-        selectTableColumn $*
+        selectTableRow $*
     fi
     if [[ "$1" == "delete" ]] && [[ "$2" == "row" ]] 
     then
@@ -53,12 +57,11 @@ checkCommand() {
 drop() {
     if [[ "$2" == "table" ]]
     then
-        removeTable $*
+        dropTable $*
     elif [[ "$2" == "database" ]]; then
-        remove_database $*
+        dropDB $*
     fi
 }
-# for internal testing 
 checkPWD() {
     echo $(pwd)
 }
@@ -70,7 +73,6 @@ show() {
         showDB $*
     fi
 }
-#recieves any create command then redirects 
 generalCreate() {
     if [[ "$2" == "table" ]]
     then
@@ -79,7 +81,6 @@ generalCreate() {
         newDB $*
     fi
 }
-#command prompt for INPUT
 DBMSloop() {
     local COMMAND=getCommand
     if [[ "$COMMAND" = "" ]]
@@ -93,7 +94,6 @@ DBMSloop() {
         done
     fi
 }
-#get command from user
 getCommand() {
     local INPUT=$(awk '{print $0}' $DBMSOPTFILE |yad --text-info --title="DBMS Commands" --text="current used dabtabase: $CURRENTDB" --editable --maximized --lang=sql)
     echo $INPUT >$DBMSOPTFILE
@@ -105,7 +105,6 @@ getCommand() {
     fi
 }
 
-#check if main dir is present and redirects user to userLogin or create user according to result
 firstRun() {
     if [[ ! -e $PARENTDIR ]]
     then

@@ -42,9 +42,9 @@ updatemode(){
         then
             local new_tabel=$(awk -F "," 'BEGIN{OFS=","}{for(i =1 ; i <=NF ; i++) if(i == "'"$column_index"'" && NR == "'"$3"'") $i="'"$new_value"'" ;print$0}' $5)
             echo "$new_tabel" > $5
-            echo Update sucess
+            zenity --info --text="Update Success"
         else
-            echo non-valid
+            zenity --info --text="non-valid"
         fi
     fi
 }
@@ -90,7 +90,6 @@ validateUniquePK(){
     fi
 }
 
-#uses global var p_key to create table_name.index
 setPK(){
     local columns=($(head -1 $3 |awk 'BEGIN{FS=",";OFS=":"}{$1=$1; print $0}'| awk 'BEGIN{FS=":"}{for(i=1;i<=NF;i++) if(i%2) print $i}'))
     declare -A MYMAP
@@ -119,7 +118,7 @@ choosePK(){
     for key in ${headers[@]}
     do
         if [[ $key == $primary_key ]]
-        then #validates primary key is in table headers
+        then
             flag=1
         fi
     done
@@ -127,7 +126,7 @@ choosePK(){
     if [[ flag -eq 1 ]]
     then
         zenity --info --text="primary_key set sucess"
-        GPK=$primary_key  # set global var p_key to be used for .index creation
+        GPK=$primary_key  
     else
         zenity --error --text="non-valid primary_key"
     fi
@@ -158,7 +157,29 @@ deleteTableRow(){
         zenity --error --text="No table with this name"
     fi
 }
-
+selectTableRow(){
+    local re='^[0-9]+$'
+    local line_num
+    typeset -i line_num
+    line_num=$(wc -l < $5)
+    if [[ -f $5 ]]
+    then
+        if [[ $3 =~ $re ]] && [[ $3 -le $line_num ]]
+        then
+            if [[ $3 -ne 1 ]]
+            then
+                awk -F"," 'BEGIN{print "<table border="3px" width="320px">"}{print"<tr>";for(i=1;i<NF+1;i++){if(NR==1){print "<th>"$i"</th>"};if(NR=='"$3"'){print "<td>"$i"</td>"}}print "</tr>"}END{print "</table>"}' $5 | yad --text-info --title="selected row from $5 table" --html --width=320 --height=480
+            else
+                zenity --error --text="you can't select the table header"
+            fi
+        else
+            zenity --error --text="non valid row number"
+        fi
+    else
+        zenity --error --text="No table with this name"
+    fi
+}
+#to get primary_key column
 selectTableColumn(){
     local OFS='BEGIN{OFS=" "}'
     local result=''
@@ -182,9 +203,30 @@ selectTableColumn(){
         ind_awk=$ind_awk+1
         result="$result\$$ind_awk\"  \" "
     done
-    awk -F',' "$(echo $OFS){\$1=\$1; print $(echo $result)}" $4  |column -t -s" "
+    awk -F',' "$(echo $OFS){\$1=\$1; print $(echo $result)}" $4 |column -t -s" "
 }
-
+selectAllTableWhere(){
+    local wherecluse
+    local chkcolumn
+    local colunmvalue
+    if  [[ "$3" == "from" ]]
+    then
+        if [[ -f $4 ]]
+        then
+            if [[ "$5" == "where" ]]
+            then
+                wherecluse="$5"
+                chkcolumn=$(echo $wherecluse |awk -F"=" '{print $1}')
+                colunmvalue=$(echo $wherecluse |qwk -F"=" '{print $2}')
+                awk -F"," 'BEGIN{column;print "<table border="3px" width="320px">"}/'"$colunmvalue"'/{print"<tr>";for(i=1;i<NF+1;i++){if(NR==1){if($i=='"$chkcolumn"')column=i;print "<th>"$i"</th>"};if(column=='"$colunmvalue"'){print "<td>"$i"</td>"}}print "</tr>"}}END{print "</table>"}' $4 | yad --text-info --title="All data from $4 table" --html --width=320 --height=480
+            else
+                zenity --error --text="invalid where cluse"
+            fi
+        else
+            zenity --info --text="No table with this name"
+        fi
+    fi
+}
 selectAllTable(){
     if  [[ "$3" == "from" ]]
     then
@@ -363,7 +405,7 @@ checkStatmentFormat() {
         echo $flag
     fi
 }
-removeTable() {
+dropTable() {
     if [[ $(pwd) != $PARENTDIR ]]
     then
         if [ -f $3 ]
