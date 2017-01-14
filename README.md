@@ -3,7 +3,7 @@ this is a bash enabled database managment system developed by me for bash shell 
 ### Installation
 DBMS requires [yad](https://sourceforge.net/projects/yad-dialog/)  to run.
 Download and extract the source code and open it in terminal
-Install the dependencies (ubuntu) try to find equivalent packages on ubuntu
+Install the dependencies (ubuntu) try to find equivalent packages for other distrubutions
 ```sh
 $ sudo apt-get install build-essential libgtk-3-0 libgtk-3-dev libgtksourceview-3.0-dev libwebkitgtk-3.0-dev
 ```
@@ -13,7 +13,7 @@ $ ./configure --enable-html  --enable-sourceview --with-gtk=gtk3
 $ make
 $ sudo make install
 ```
-now open DBMS Folde and type 
+now open DBMS Folder and type 
 ```sh
 $ chomd +x *
 $ ./start.sh
@@ -35,7 +35,7 @@ $ update
 ```
 ### Development
 Want to contribute? Great!
-DBMS uses bash  + yad or zenity for gui.
+my DBMS uses bash  + yad or zenity for gui.
 ##### Big Thanks to my dear friend [Dr-AhmedAmer](https://github.com/Dr-AhmedAmer) for his Continued support 
 
 
