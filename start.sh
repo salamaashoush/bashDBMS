@@ -1,12 +1,42 @@
 #!/usr/bin/env bash
 set -x
-PARENTDIR="$HOME/bash_dbms"
-USERSFILE="$PARENTDIR/users_file"
-DBMSOPTFILE="$PARENTDIR/dbms_opt"
+ROOTDIR="$HOME/bash_dbms/"
+PARENTDIR="$ROOTDIR/databases"
+USERSFILE="$ROOTDIR/users_file"
+DBMSOPTFILE="$ROOTDIR/dbms_opt"
+
 GPK=""
 . ./tablemodule.sh
 . ./dbmodule.sh
 . ./usermodule.sh
+commandHelp(){
+    case "$2" in
+        "create")
+            cat "$ROOTDIR/help/create.html" | yad --text-info --text="help" --html --width=400 --height=600
+            ;;
+        "select")
+            cat "$ROOTDIR/help/select.html" | yad --text-info --text="help" --html --width=400 --height=600
+            ;;
+        "drop")
+            cat "$ROOTDIR/help/drop.html" | yad --text-info --text="help" --html --width=400 --height=600
+            ;;
+        "delete")
+            cat "$ROOTDIR/help/delete.html" | yad --text-info --text="help" --html --width=400 --height=600
+            ;;
+        "update")
+            cat "$ROOTDIR/help/update.html" | yad --text-info --text="help" --html --width=400 --height=600
+            ;;
+        "use")
+            cat "$ROOTDIR/help/use.html" | yad --text-info --text="help" --html --width=400 --height=600
+            ;;
+        "show")
+            cat "$ROOTDIR/help/show.html" | yad --text-info --text="help" --html --width=400 --height=600
+            ;;
+        *)
+            cat "$ROOTDIR/help/general.html" | yad --text-info --text="help" --html --width=400 --height=600
+
+    esac
+}
 checkCommand() {
     if [[ "$1" == "create" ]]
     then
@@ -36,11 +66,6 @@ checkCommand() {
     then
         selectAllTable $*
     fi
-    #if [[ "$1" == "select" ]] && [[ "$2" == "all" ]] && [[ "$5" == "where" ]]
-    #then
-        #selectAllTableWhere $*
-    #fi
-
     if [[ "$1" == "select" ]] && [[ "$2" == "row" ]]
     then
         selectTableRow $*
@@ -53,6 +78,11 @@ checkCommand() {
     then
         updateTableRow $*
     fi
+    if [[ "$1" == "help" ]]
+    then
+        commandHelp $*
+    fi
+
 }
 drop() {
     if [[ "$2" == "table" ]]

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 updatemode(){
-    local primary_key=$(cat $5.index | awk 'BEGIN{FS=":"} {print $1}')
+    local primary_key=$(cat $5.meta | awk 'BEGIN{FS=":"} {print $1}')
     if [[ $7 == $primary_key ]]
     then
         zenity --error --text="cannot update primary_key"
@@ -77,10 +77,10 @@ validateUniquePK(){
     local temp_values=$(echo $insert_statment | awk 'BEGIN {FS = "("} {print $2}')
     local raw_values=$(echo $temp_values | awk 'BEGIN {FS = ")"} {print $1}')
     local values=($(echo $raw_values | awk 'BEGIN {FS=","}{for(i=1;i<=NF;i++) print $i}'))
-    local key=$(cat $4.index | awk 'BEGIN{FS=":"} {print $1}')
+    local key=$(cat $4.meta | awk 'BEGIN{FS=":"} {print $1}')
     local key_column_values=$(selectTableColumn $1 $key $3 $4)
     typeset -i p_key_index
-    local p_key_index=$(cat $4.index | awk 'BEGIN{FS=":"} {print $2}')
+    local p_key_index=$(cat $4.meta | awk 'BEGIN{FS=":"} {print $2}')
     echo $key_column_values | grep ${values[$p_key_index]}
     if [[  $? -eq 0 ]]
     then
@@ -105,7 +105,7 @@ setPK(){
         fi
         iterator=$iterator+1
     done
-    echo "$GPK:$p_key_index" > $3.index
+    echo "$GPK:$p_key_index" > $3.meta
 }
 
 choosePK(){
@@ -145,7 +145,7 @@ deleteTableRow(){
             if [[ $3 -ne 1 ]]
             then
                 sed -i "$3 d" $5
-                sed -i "$3 d" $5.index
+                sed -i "$3 d" $5.meta
                 zenity --info --text="row $3 deleted"
             else
                 zenity --error --text="cannot delete table header"
@@ -205,28 +205,7 @@ selectTableColumn(){
     done
     awk -F',' "$(echo $OFS){\$1=\$1; print $(echo $result)}" $4 |column -t -s" "
 }
-selectAllTableWhere(){
-    local wherecluse
-    local chkcolumn
-    local colunmvalue
-    if  [[ "$3" == "from" ]]
-    then
-        if [[ -f $4 ]]
-        then
-            if [[ "$5" == "where" ]]
-            then
-                wherecluse="$5"
-                chkcolumn=$(echo $wherecluse |awk -F"=" '{print $1}')
-                colunmvalue=$(echo $wherecluse |qwk -F"=" '{print $2}')
-                awk -F"," 'BEGIN{column;print "<table border="3px" width="320px">"}/'"$colunmvalue"'/{print"<tr>";for(i=1;i<NF+1;i++){if(NR==1){if($i=='"$chkcolumn"')column=i;print "<th>"$i"</th>"};if(column=='"$colunmvalue"'){print "<td>"$i"</td>"}}print "</tr>"}}END{print "</table>"}' $4 | yad --text-info --title="All data from $4 table" --html --width=320 --height=480
-            else
-                zenity --error --text="invalid where cluse"
-            fi
-        else
-            zenity --info --text="No table with this name"
-        fi
-    fi
-}
+
 selectAllTable(){
     if  [[ "$3" == "from" ]]
     then
@@ -312,8 +291,8 @@ tableInsert() {
     local valid_insertion=$(validateInsertDatatype $*)
     local unique_p_key
     if [[ "$check_path" == "$PARENTDIR" ]]
-    then #check if databse is selected
-        echo choose db first;
+    then
+        zenity --error --text="choose db first"
     else
         if [[ -f $4 ]]
         then #check if table is present
@@ -411,7 +390,7 @@ dropTable() {
         if [ -f $3 ]
         then
             rm $3
-            rm $3.index
+            rm $3.meta
             zenity --info --text="tabel $3 removed !"
         else
             zenity --error --text="No tables with this name"
@@ -424,7 +403,7 @@ dropTable() {
 showTable() {
     if [[ $(pwd) != $PARENTDIR ]]
     then
-        ls -l $(pwd) | awk 'BEGIN{FS=" "}{if($0!="")print $9}'| grep -v .index |zenity --text-info --title="Tables"
+        ls -l $(pwd) | awk 'BEGIN{FS=" "}{if($0!="")print $9}'| grep -v .meta |zenity --text-info --title="Tables"
     else
         zenity --error --text="Select a database first"
         zenity --info --text="You can use show databases to list availabe databases"
